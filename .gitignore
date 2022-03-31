@@ -3,5 +3,5 @@ filesystem/interactions/intrac.btb
 node_modules/
 obj/
 build/
-mMC_output/
+output/
 .env
