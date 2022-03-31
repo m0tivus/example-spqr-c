@@ -21,7 +21,7 @@ $ cd filesystem/interactions && unzip intrac.btb.zip
 ```sh
 $ motivus build
 ```
-Tip: When the flag `--dev` is set, `stdout` and `stderr` will print to worker console instead of a log file.
+Tip: When the flag `-D` is set, `stdout` and `stderr` will print to worker console instead of a log file.
 - Package is then created in `build` directory
 
 **Important**: when making changes to `filesystem/` the `.data.zip` link used in the driver should also be updated. 
@@ -33,35 +33,39 @@ Tip: When the flag `--dev` is set, `stdout` and `stderr` will print to worker co
 ```sh
 $ motivus loopback
 ```
-- Set the environment value to point the driver execution to the loop-back server
+- Set the environment value to point the driver execution to the loop-back server via .env file
 ```sh
-export WEBSOCKET_URI=ws://localhost:7070/client_socket/websocket
+# .env
+WEBSOCKET_URI=ws://localhost:7070/client_socket/websocket
 ```
 - Run the driver
 `python driver.py`
 - All tasks are sent to the worker for processing.
-- The result files are stored in `mMC_output` directory.
+- The result files are stored in `output` directory.
 
 #### Running on Motivus cluster
 You will need a valid `application_token` to run tasks on Motivus cluster.
-- Make the following environment variables available in current session
+- Make the following environment variables available in current session via a .env file
 ```sh
-export WEBSOCKET_URI=wss://waterbear.api.motivus.cl/client_socket/websocket
-export APPLICATION_TOKEN=<your application token>
+# .env
+APPLICATION_TOKEN=<your application token>
 ```
 - Run the driver
 `python driver.py`
 - All tasks are sent to the Motivus cluster available workers for processing.
-- The result files are stored in `mMC_output` directory.
+- The result files are stored in `output` directory.
 
 # Using as a template for other C/C++ projects
 Several files are relevant:
-- `Makefile` describes all the compilation and packaging steps:
-    - It is based on the program source's `Makefile.in`
+- `Makefile` describes the compilation steps:
+    - It is based on the program's source `Makefile.in`
     - Uses the emscripten compiler with a JS/WASM output target.
-    - Bundles all files into one compressed archive for marketplace publishing.
-- `waterbear.emscripten.js` is the *glue* code that communicates Motivus and the emscripten module.
-- `webpack.config.js` handles the transformation of the worker code for web and node environments.
-- `package.json` lists dependencies for webpack bundler.
+    - It is required that you define an `app` target, with `emscripten` compiler. Some environment variables are present when executing `motivus build`:
+        - `OBJ_DIR`: where intermediate compilation files are located.
+        - `SOURCE_DIR`: where the source files are located, as specified in `motivus.yml`
+        - `BUILD_DIR`: where the files result of the compilation are stored, as specified in `motivus.yml`
+        - `FILESYSTEM_DIR`: a directory which should be used as starting filesystem on algorithm execution, as specified in `motivus.yml`
+        - `PACKAGE`: the name of the algorithm including its version. Must be used as output file names.
+        
 - `motivus.yml` is a configuration file that describes metadata for building, packaging and publishing algorithms.
 - `filesystem/` refers to the files available during execution on a worker's virtual file system: It is required that contains at least one file.

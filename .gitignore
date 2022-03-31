@@ -4,4 +4,4 @@ node_modules/
 obj/
 build/
 mMC_output/
-
+.env
